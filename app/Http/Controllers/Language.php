@@ -53,13 +53,26 @@ class Language extends Controller
     {
         try { 
             $language_id = $id;
-            $languages = languages::where("id", $language_id)->with('language_encoding')->first();        
+            $language = languages::where("id", $language_id)->with('language_encoding')->first(); 
+
+            $language_encoding = [];
+                foreach ($language->language_encoding as $encoding) {
+                    $language_encoding[$encoding->to_be_encoded] = $encoding->is_encoded;
+                }
+
+
+
+            $language_decoding = [];
+            foreach ($language->language_encoding as $encoding) {
+                $language_decoding[$encoding->is_encoded] = $encoding->to_be_encoded;
+            }
+
         }catch (\Exception $e) {
             dd($e->getMessage());
         }
 
 
-        return response()->json($languages);
+        return response()->json([ 'encoded' => $language_encoding, 'decoded' => $language_decoding]);
     }
 
 
